@@ -115,7 +115,7 @@ function Index() {
         setProfile(rowToProfile(profRow));
       }
       if (planRow) {
-        setPlan(planRow.plan as WorkoutPlan);
+        setPlan(planRow.plan as unknown as WorkoutPlan);
         setPlanNumber(planRow.plan_number);
         setPlanCreatedAt(new Date(planRow.created_at));
         setStep("plan");
@@ -141,7 +141,7 @@ function Index() {
       .from("workout_plans")
       .insert({
         user_id: user.id,
-        plan: newPlan as unknown as Record<string, unknown>,
+        plan: newPlan as any,
         plan_number: nextPlanNumber,
       })
       .select()
