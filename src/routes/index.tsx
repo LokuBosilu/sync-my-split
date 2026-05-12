@@ -247,7 +247,7 @@ function Index() {
         {authLoading || bootstrapping ? (
           <div className="pt-24"><LoadingState /></div>
         ) : !user ? (
-          <Login />
+          <Login initialError={authError} />
         ) : (
           <>
             {step === "stats" && (
