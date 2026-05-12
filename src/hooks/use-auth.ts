@@ -5,39 +5,61 @@ import { supabase } from "@/integrations/supabase/client";
 export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
 
-    // 1) Subscribe FIRST so we don't miss the SIGNED_IN event from URL detection
     const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
       if (!mounted) return;
       setSession(s);
       setLoading(false);
     });
 
-    // 2) Handle magic-link return:
-    //    - PKCE flow returns ?code=... in the query string
-    //    - Implicit flow returns #access_token=... in the hash
-    //    Exchange/parse and then strip from the URL so refreshes are clean.
     (async () => {
       try {
         const url = new URL(window.location.href);
         const code = url.searchParams.get("code");
-        const hash = window.location.hash;
+        const queryError =
+          url.searchParams.get("error_code") || url.searchParams.get("error");
+        const hash = window.location.hash.startsWith("#")
+          ? window.location.hash.slice(1)
+          : window.location.hash;
+        const hashParams = new URLSearchParams(hash);
+        const hashError =
+          hashParams.get("error_code") || hashParams.get("error");
 
-        if (code) {
+        const friendly = (err: string | null) => {
+          if (!err) return null;
+          if (err === "otp_expired" || err === "access_denied") {
+            return "Your login link expired — enter your email to get a new one.";
+          }
+          return `Login error: ${err.replace(/_/g, " ")}`;
+        };
+
+        const cleanUrl = () => {
+          url.searchParams.delete("code");
+          url.searchParams.delete("state");
+          url.searchParams.delete("error");
+          url.searchParams.delete("error_code");
+          url.searchParams.delete("error_description");
+          window.history.replaceState({}, "", url.pathname + url.search);
+        };
+
+        if (hashError || queryError) {
+          if (mounted) setAuthError(friendly(hashError || queryError));
+          cleanUrl();
+        } else if (code) {
           const { data, error } = await supabase.auth.exchangeCodeForSession(
             window.location.href
           );
-          if (!error && data.session && mounted) {
+          if (error) {
+            if (mounted) setAuthError(friendly(error.message) || error.message);
+          } else if (data.session && mounted) {
             setSession(data.session);
           }
-          url.searchParams.delete("code");
-          url.searchParams.delete("state");
-          window.history.replaceState({}, "", url.pathname + url.search + url.hash);
-        } else if (hash.includes("access_token")) {
-          // supabase-js auto-detects hash session on init; just clean URL after
+          cleanUrl();
+        } else if (hashParams.get("access_token")) {
           const { data } = await supabase.auth.getSession();
           if (data.session && mounted) setSession(data.session);
           window.history.replaceState({}, "", url.pathname + url.search);
@@ -58,5 +80,11 @@ export function useAuth() {
     };
   }, []);
 
-  return { session, user: (session?.user ?? null) as User | null, loading };
+  return {
+    session,
+    user: (session?.user ?? null) as User | null,
+    loading,
+    authError,
+    clearAuthError: () => setAuthError(null),
+  };
 }
