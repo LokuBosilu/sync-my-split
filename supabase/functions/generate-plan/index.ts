@@ -24,6 +24,11 @@ RULES:
 
 You MUST call the return_workout_plan function with the structured plan. Do not respond in plain text.`;
 
+    const planNumber = Number(profile.planNumber ?? 1);
+    const progression = planNumber > 1
+      ? `\n\nThis is plan #${planNumber} for this user — they have completed ${planNumber - 1} prior 8-week block(s). Make this plan more advanced than a beginner block: increase intensity (heavier loading schemes, lower reps on key compounds, intensity techniques like drop sets / rest-pause / tempo work where appropriate), introduce greater exercise variety (rotate primary lifts, add unilateral and accessory variations they likely haven't seen), and progress total weekly volume sensibly.`
+      : "";
+
     const userPrompt = `User profile:
 Name: ${profile.name}
 Age: ${profile.age}
@@ -32,7 +37,8 @@ Weight: ${profile.weight}
 Goal: ${profile.goal}
 Training days per week: ${profile.daysPerWeek}
 Suggested split: ${profile.suggestedSplit}
-Available equipment: ${profile.equipment.join(", ")}`;
+Available equipment: ${profile.equipment.join(", ")}
+Plan number: ${planNumber}${progression}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
