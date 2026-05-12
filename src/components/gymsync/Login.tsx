@@ -37,6 +37,12 @@ export function Login({ initialError }: { initialError?: string | null } = {}) {
         </p>
       </header>
 
+      {initialError && !sent && (
+        <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm">
+          {initialError}
+        </div>
+      )}
+
       {sent ? (
         <div className="rounded-xl border border-primary/40 bg-primary/5 p-6 space-y-2">
           <p className="text-xs uppercase tracking-[0.3em] text-primary">Check your inbox</p>
