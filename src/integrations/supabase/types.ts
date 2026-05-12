@@ -14,7 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          age: number | null
+          created_at: string
+          days_per_week: number | null
+          equipment: string[] | null
+          goal: string | null
+          height_cm: number | null
+          height_ft: number | null
+          height_in: number | null
+          height_unit: string | null
+          id: string
+          name: string | null
+          updated_at: string
+          user_id: string
+          weight: number | null
+          weight_unit: string | null
+        }
+        Insert: {
+          age?: number | null
+          created_at?: string
+          days_per_week?: number | null
+          equipment?: string[] | null
+          goal?: string | null
+          height_cm?: number | null
+          height_ft?: number | null
+          height_in?: number | null
+          height_unit?: string | null
+          id?: string
+          name?: string | null
+          updated_at?: string
+          user_id: string
+          weight?: number | null
+          weight_unit?: string | null
+        }
+        Update: {
+          age?: number | null
+          created_at?: string
+          days_per_week?: number | null
+          equipment?: string[] | null
+          goal?: string | null
+          height_cm?: number | null
+          height_ft?: number | null
+          height_in?: number | null
+          height_unit?: string | null
+          id?: string
+          name?: string | null
+          updated_at?: string
+          user_id?: string
+          weight?: number | null
+          weight_unit?: string | null
+        }
+        Relationships: []
+      }
+      workout_plans: {
+        Row: {
+          created_at: string
+          id: string
+          plan: Json
+          plan_number: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          plan: Json
+          plan_number?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          plan?: Json
+          plan_number?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
