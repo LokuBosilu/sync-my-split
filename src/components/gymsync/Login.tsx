@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
-export function Login() {
+export function Login({ initialError }: { initialError?: string | null } = {}) {
   const [email, setEmail] = useState("");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -36,6 +36,12 @@ export function Login() {
           We'll email you a magic link. No passwords. Your plan stays with you across devices.
         </p>
       </header>
+
+      {initialError && !sent && (
+        <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm">
+          {initialError}
+        </div>
+      )}
 
       {sent ? (
         <div className="rounded-xl border border-primary/40 bg-primary/5 p-6 space-y-2">

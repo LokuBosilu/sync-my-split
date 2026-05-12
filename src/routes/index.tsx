@@ -82,7 +82,7 @@ function profileToRow(p: UserProfile, userId: string) {
 }
 
 function Index() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, authError } = useAuth();
   const [bootstrapping, setBootstrapping] = useState(true);
   const [step, setStep] = useState<Step>("stats");
   const [profile, setProfile] = useState<UserProfile>(initialProfile);
@@ -247,7 +247,7 @@ function Index() {
         {authLoading || bootstrapping ? (
           <div className="pt-24"><LoadingState /></div>
         ) : !user ? (
-          <Login />
+          <Login initialError={authError} />
         ) : (
           <>
             {step === "stats" && (
