@@ -1,6 +1,15 @@
 import { useState } from "react";
 import type { PlanDay, UserProfile, WorkoutPlan } from "@/lib/gymsync";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { PlanHistory } from "./PlanHistory";
 
 interface Props {
   profile: UserProfile;
@@ -8,9 +17,18 @@ interface Props {
   onRegenerate: () => void;
   onRestart: () => void;
   regenerating: boolean;
+  userId: string;
 }
 
-export function PlanView({ profile, plan, onRegenerate, onRestart, regenerating }: Props) {
+export function PlanView({ profile, plan, onRegenerate, onRestart, regenerating, userId }: Props) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+
+  const handleRegenClick = () => setConfirmOpen(true);
+  const confirmRegen = () => {
+    setConfirmOpen(false);
+    onRegenerate();
+  };
   return (
     <div className="fade-slide-in space-y-10">
       <header className="space-y-3">
