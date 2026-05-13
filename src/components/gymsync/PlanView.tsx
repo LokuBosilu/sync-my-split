@@ -51,7 +51,7 @@ export function PlanView({ profile, plan, onRegenerate, onRestart, regenerating,
 
       <div className="flex flex-wrap items-center gap-4 pt-6 border-t border-border">
         <button
-          onClick={onRegenerate}
+          onClick={handleRegenClick}
           disabled={regenerating}
           className={cn(
             "inline-flex items-center gap-3 rounded-md px-6 py-3.5 font-display text-lg uppercase tracking-wider transition-all",
@@ -63,12 +63,47 @@ export function PlanView({ profile, plan, onRegenerate, onRestart, regenerating,
           {regenerating ? "Regenerating…" : "↻ Regenerate Plan"}
         </button>
         <button
+          onClick={() => setHistoryOpen(true)}
+          className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-5 py-3 font-display text-sm uppercase tracking-wider text-foreground hover:border-primary/50 hover:text-primary transition-colors"
+        >
+          View Plan History
+        </button>
+        <button
           onClick={onRestart}
           className="text-sm uppercase tracking-wider text-muted-foreground hover:text-foreground"
         >
           Start over
         </button>
       </div>
+
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent className="bg-card border-border">
+          <DialogHeader>
+            <DialogTitle className="font-display text-2xl tracking-wide">
+              Regenerate Your Plan?
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground pt-2">
+              This will replace your current plan with a fresh one. Your plan history will be saved.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <button
+              onClick={() => setConfirmOpen(false)}
+              className="rounded-md border border-border bg-background px-5 py-2.5 text-sm uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={confirmRegen}
+              className="rounded-md bg-primary px-5 py-2.5 font-display text-sm uppercase tracking-wider text-primary-foreground hover:shadow-[0_0_30px_-5px_var(--primary)] transition-all"
+            >
+              Yes, Regenerate
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <PlanHistory open={historyOpen} onOpenChange={setHistoryOpen} userId={userId} />
     </div>
   );
 }
