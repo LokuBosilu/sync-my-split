@@ -65,12 +65,12 @@ export function PlanHistory({ open, onOpenChange, userId }: Props) {
           {rows === null && (
             <p className="text-sm text-muted-foreground">Loading…</p>
           )}
-          {rows && rows.length <= 1 && (
+          {rows && rows.length === 0 && (
             <p className="text-sm text-muted-foreground border border-dashed border-border rounded-lg p-6 text-center">
               Your future plans will appear here as you progress.
             </p>
           )}
-          {rows && rows.length > 1 && rows.map((r) => {
+          {rows && rows.length > 0 && rows.map((r) => {
             const isOpen = expanded === r.id;
             const date = new Date(r.created_at).toLocaleDateString(undefined, {
               year: "numeric", month: "long", day: "numeric",
