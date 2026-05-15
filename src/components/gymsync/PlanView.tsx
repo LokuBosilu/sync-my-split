@@ -108,6 +108,33 @@ export function PlanView({ profile, plan, onRegenerate, onRestart, regenerating,
         </DialogContent>
       </Dialog>
 
+      <Dialog open={restartOpen} onOpenChange={setRestartOpen}>
+        <DialogContent className="bg-card border-border">
+          <DialogHeader>
+            <DialogTitle className="font-display text-2xl tracking-wide">
+              Start Over?
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground pt-2">
+              This will delete your current plan and profile and take you back to the beginning. This cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <button
+              onClick={() => setRestartOpen(false)}
+              className="rounded-md border border-border bg-background px-5 py-2.5 text-sm uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={confirmRestart}
+              className="rounded-md bg-destructive px-5 py-2.5 font-display text-sm uppercase tracking-wider text-destructive-foreground hover:shadow-[0_0_30px_-5px_hsl(var(--destructive))] transition-all"
+            >
+              Yes, Start Over
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <PlanHistory open={historyOpen} onOpenChange={setHistoryOpen} userId={userId} />
     </div>
   );
