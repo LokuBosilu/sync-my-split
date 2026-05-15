@@ -329,7 +329,7 @@ function Index() {
                   plan={plan}
                   regenerating={regenerating}
                   onRegenerate={() => generate(profile, { regen: true })}
-                  onRestart={startReassessment}
+                  onRestart={startOver}
                 />
               </div>
             )}
