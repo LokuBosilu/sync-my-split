@@ -74,7 +74,7 @@ export function PlanView({ profile, plan, onRegenerate, onRestart, regenerating,
           View Plan History
         </button>
         <button
-          onClick={onRestart}
+          onClick={() => setRestartOpen(true)}
           className="text-sm uppercase tracking-wider text-muted-foreground hover:text-foreground"
         >
           Start over
