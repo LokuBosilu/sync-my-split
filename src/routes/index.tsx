@@ -214,7 +214,7 @@ function Index() {
       const newPlan = data.plan as WorkoutPlan;
       setPlan(newPlan);
       setBannerDismissed(false);
-      await persistProfileAndPlan(p, newPlan, nextPlanNumber);
+      await persistProfileAndPlan(p, newPlan, nextPlanNumber, opts?.regen ? "overwrite" : "insert");
       setStep("plan");
     } catch (e) {
       console.error(e);
