@@ -231,6 +231,21 @@ function Index() {
     setStep("stats");
   };
 
+  const startOver = async () => {
+    if (user) {
+      await Promise.all([
+        supabase.from("workout_plans").delete().eq("user_id", user.id),
+        supabase.from("profiles").delete().eq("user_id", user.id),
+      ]);
+    }
+    setProfile(initialProfile);
+    setPlan(null);
+    setPlanNumber(0);
+    setPlanCreatedAt(null);
+    setBannerDismissed(false);
+    setStep("stats");
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
     setProfile(initialProfile);
