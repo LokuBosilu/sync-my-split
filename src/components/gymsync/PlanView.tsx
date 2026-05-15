@@ -23,11 +23,16 @@ interface Props {
 export function PlanView({ profile, plan, onRegenerate, onRestart, regenerating, userId }: Props) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [restartOpen, setRestartOpen] = useState(false);
 
   const handleRegenClick = () => setConfirmOpen(true);
   const confirmRegen = () => {
     setConfirmOpen(false);
     onRegenerate();
+  };
+  const confirmRestart = () => {
+    setRestartOpen(false);
+    onRestart();
   };
   return (
     <div className="fade-slide-in space-y-10">
