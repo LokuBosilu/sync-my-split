@@ -184,11 +184,7 @@ function Index() {
     if (opts?.regen) setRegenerating(true);
     else setStep("loading");
 
-    const nextPlanNumber = opts?.regen
-      ? Math.max(planNumber, 1)
-      : opts?.reassessment
-      ? planNumber + 1
-      : (planNumber || 0) + 1;
+    const nextPlanNumber = (planNumber || 0) + 1;
 
     try {
       const payload = {
@@ -214,7 +210,7 @@ function Index() {
       const newPlan = data.plan as WorkoutPlan;
       setPlan(newPlan);
       setBannerDismissed(false);
-      await persistProfileAndPlan(p, newPlan, nextPlanNumber, opts?.regen ? "overwrite" : "insert");
+      await persistProfileAndPlan(p, newPlan, nextPlanNumber, "insert");
       setStep("plan");
     } catch (e) {
       console.error(e);
