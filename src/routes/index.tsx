@@ -129,13 +129,39 @@ function Index() {
   const persistProfileAndPlan = async (
     p: UserProfile,
     newPlan: WorkoutPlan,
-    nextPlanNumber: number
+    nextPlanNumber: number,
+    mode: "insert" | "overwrite"
   ) => {
     if (!user) return;
     const { error: pErr } = await supabase
       .from("profiles")
       .upsert(profileToRow(p, user.id), { onConflict: "user_id" });
     if (pErr) console.error(pErr);
+
+    if (mode === "overwrite") {
+      // Find current (most recent) plan row and update it in place
+      const { data: current } = await supabase
+        .from("workout_plans")
+        .select("id")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (current?.id) {
+        const nowIso = new Date().toISOString();
+        const { data: updated, error: updErr } = await supabase
+          .from("workout_plans")
+          .update({ plan: newPlan as any, created_at: nowIso })
+          .eq("id", current.id)
+          .select()
+          .single();
+        if (updErr) console.error(updErr);
+        if (updated) setPlanCreatedAt(new Date(updated.created_at));
+        return;
+      }
+      // Fall through to insert if no existing row
+    }
 
     const { data: planRow, error: planErr } = await supabase
       .from("workout_plans")
