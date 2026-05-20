@@ -80,6 +80,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "GymSync — Personalized Workout Plan Generator" },
+      { name: "twitter:description", content: "AI-generated training splits, dialled in to your stats, gear and goal." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/59b302b2-7590-4c70-8dc4-1450c847d315" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/59b302b2-7590-4c70-8dc4-1450c847d315" },
     ],
     links: [
       {
