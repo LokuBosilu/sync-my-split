@@ -14,6 +14,85 @@ export type Database = {
   }
   public: {
     Tables: {
+      gym_invites: {
+        Row: {
+          code: string
+          created_at: string
+          gym_id: string
+          id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          gym_id: string
+          id?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          gym_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gym_invites_gym_id_fkey"
+            columns: ["gym_id"]
+            isOneToOne: false
+            referencedRelation: "gyms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gym_members: {
+        Row: {
+          gym_id: string
+          id: string
+          joined_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          gym_id: string
+          id?: string
+          joined_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          gym_id?: string
+          id?: string
+          joined_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gym_members_gym_id_fkey"
+            columns: ["gym_id"]
+            isOneToOne: false
+            referencedRelation: "gyms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gyms: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: number | null

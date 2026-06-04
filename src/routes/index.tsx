@@ -92,6 +92,52 @@ function Index() {
   const [regenerating, setRegenerating] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
 
+  // Capture ?invite=CODE from URL on first load (before magic-link redirect strips it)
+  useEffect(() => {
+    try {
+      const url = new URL(window.location.href);
+      const invite = url.searchParams.get("invite");
+      if (invite) {
+        localStorage.setItem("pendingInviteCode", invite.trim());
+        url.searchParams.delete("invite");
+        window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+      }
+    } catch {}
+  }, []);
+
+  // After sign-in, redeem any pending invite code → insert gym_members row
+  useEffect(() => {
+    if (!user) return;
+    const code = localStorage.getItem("pendingInviteCode");
+    if (!code) return;
+    (async () => {
+      try {
+        const { data: invite, error: invErr } = await supabase
+          .from("gym_invites")
+          .select("gym_id")
+          .eq("code", code)
+          .maybeSingle();
+        if (invErr) throw invErr;
+        if (!invite) {
+          toast.error("Invite code not found");
+          localStorage.removeItem("pendingInviteCode");
+          return;
+        }
+        const { error: memErr } = await supabase
+          .from("gym_members")
+          .upsert(
+            { user_id: user.id, gym_id: invite.gym_id, status: "active", joined_at: new Date().toISOString() },
+            { onConflict: "user_id,gym_id" }
+          );
+        if (memErr) throw memErr;
+        localStorage.removeItem("pendingInviteCode");
+        toast.success("Joined gym successfully");
+      } catch (e) {
+        console.error("[invite] redeem failed", e);
+      }
+    })();
+  }, [user?.id]);
+
   // Load existing profile + latest plan when user signs in
   useEffect(() => {
     if (!user) {
