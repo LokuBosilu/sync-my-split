@@ -176,7 +176,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      redeem_gym_invite: { Args: { _code: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never
