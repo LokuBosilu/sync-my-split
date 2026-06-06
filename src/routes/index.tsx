@@ -112,24 +112,13 @@ function Index() {
     if (!code) return;
     (async () => {
       try {
-        const { data: invite, error: invErr } = await supabase
-          .from("gym_invites")
-          .select("gym_id")
-          .eq("code", code)
-          .maybeSingle();
-        if (invErr) throw invErr;
-        if (!invite) {
+        const { data: gymId, error } = await supabase.rpc("redeem_gym_invite", { _code: code });
+        if (error) throw error;
+        if (!gymId) {
           toast.error("Invite code not found");
           localStorage.removeItem("pendingInviteCode");
           return;
         }
-        const { error: memErr } = await supabase
-          .from("gym_members")
-          .upsert(
-            { user_id: user.id, gym_id: invite.gym_id, status: "active", joined_at: new Date().toISOString() },
-            { onConflict: "user_id,gym_id" }
-          );
-        if (memErr) throw memErr;
         localStorage.removeItem("pendingInviteCode");
         toast.success("Joined gym successfully");
       } catch (e) {
