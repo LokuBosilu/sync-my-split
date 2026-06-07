@@ -19,6 +19,7 @@ import { LoadingState } from "@/components/gymsync/LoadingState";
 import { PlanView } from "@/components/gymsync/PlanView";
 import { PlanExpiredBanner } from "@/components/gymsync/PlanExpiredBanner";
 import { Login } from "@/components/gymsync/Login";
+import { AppNav } from "@/components/gymsync/AppNav";
 import { Toaster } from "@/components/ui/sonner";
 
 export const Route = createFileRoute("/")({
@@ -296,11 +297,12 @@ function Index() {
         <div className="absolute bottom-0 right-0 h-[400px] w-[400px] rounded-full bg-primary/5 blur-[100px]" />
       </div>
 
-      <header className="px-6 md:px-10 pt-8 pb-4 flex items-center justify-between">
+      <header className="px-6 md:px-10 pt-8 pb-4 flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-2.5">
           <span className="inline-block h-2.5 w-2.5 rounded-sm bg-primary" />
           <span className="font-display text-2xl tracking-widest">GYMSYNC</span>
         </div>
+        {user && step === "plan" && <AppNav />}
         {user ? (
           <button
             onClick={signOut}
