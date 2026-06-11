@@ -13,7 +13,7 @@ const BODY = "#1f1f1f";
 
 export function MuscleMap({ active, restDay, focus }: Props) {
   const data = active.length
-    ? [{ name: focus ?? "Today", muscles: active as unknown as string[] }]
+    ? [{ name: focus ?? "Today", muscles: active }]
     : [];
 
   return (
@@ -34,7 +34,6 @@ export function MuscleMap({ active, restDay, focus }: Props) {
               <p className="mb-2 text-center text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
                 Front
               </p>
-              {/* @ts-expect-error - Model has loose typings */}
               <Model
                 type="anterior"
                 data={data}
@@ -47,7 +46,7 @@ export function MuscleMap({ active, restDay, focus }: Props) {
               <p className="mb-2 text-center text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
                 Back
               </p>
-              {/* @ts-expect-error - Model has loose typings */}
+              
               <Model
                 type="posterior"
                 data={data}
