@@ -1,88 +1,114 @@
-export type MuscleId =
+import type { PlanDay } from "./gymsync";
+
+export type Muscle =
+  | "trapezius"
+  | "upper-back"
+  | "lower-back"
   | "chest"
-  | "shoulders_front"
-  | "shoulders_rear"
   | "biceps"
   | "triceps"
-  | "forearms"
+  | "forearm"
+  | "back-deltoids"
+  | "front-deltoids"
   | "abs"
-  | "quads"
-  | "hamstrings"
+  | "obliques"
+  | "adductor"
+  | "abductors"
+  | "hamstring"
+  | "quadriceps"
   | "calves"
-  | "upper_back"
-  | "lats"
-  | "lower_back"
-  | "glutes";
+  | "gluteal";
 
-export const MUSCLE_LABELS: Record<MuscleId, string> = {
+export const MUSCLE_LABELS: Record<Muscle, string> = {
+  trapezius: "Trapezius",
+  "upper-back": "Upper Back",
+  "lower-back": "Lower Back",
   chest: "Chest",
-  shoulders_front: "Shoulders (Front)",
-  shoulders_rear: "Shoulders (Rear)",
   biceps: "Biceps",
   triceps: "Triceps",
-  forearms: "Forearms",
+  forearm: "Forearms",
+  "back-deltoids": "Rear Delts",
+  "front-deltoids": "Front Delts",
   abs: "Abs",
-  quads: "Quadriceps",
-  hamstrings: "Hamstrings",
+  obliques: "Obliques",
+  adductor: "Adductors",
+  abductors: "Abductors",
+  hamstring: "Hamstrings",
+  quadriceps: "Quadriceps",
   calves: "Calves",
-  upper_back: "Upper Back",
-  lats: "Lats",
-  lower_back: "Lower Back",
-  glutes: "Glutes",
+  gluteal: "Glutes",
 };
 
-// Match keywords in a focus name (e.g. "Push — Chest, Shoulders, Triceps")
-// to muscle group IDs.
-export function muscleIdsFromFocus(focus: string): MuscleId[] {
-  const f = focus.toLowerCase();
-  const hits = new Set<MuscleId>();
+function matchText(text: string): Muscle[] {
+  const f = text.toLowerCase();
+  const hits = new Set<Muscle>();
+  const add = (...ids: Muscle[]) => ids.forEach((i) => hits.add(i));
 
-  const add = (...ids: MuscleId[]) => ids.forEach((i) => hits.add(i));
+  if (/\bchest\b|pec|bench press|push[- ]?up|fly\b|flyes/.test(f)) add("chest");
+  if (/\bshoulder|\bdelt|overhead press|ohp|military press/.test(f))
+    add("front-deltoids", "back-deltoids");
+  if (/front delt|front-delt/.test(f)) add("front-deltoids");
+  if (/rear delt|rear-delt|face pull|reverse fly/.test(f)) add("back-deltoids");
+  if (/\bbicep|curl\b|chin[- ]?up/.test(f)) add("biceps");
+  if (/\btricep|dip\b|skull crusher|pushdown|push-down|kickback/.test(f)) add("triceps");
+  if (/\bforearm|\bgrip\b|wrist curl/.test(f)) add("forearm");
+  if (/\bab\b|\babs\b|\bcore\b|crunch|plank|sit[- ]?up|leg raise/.test(f)) add("abs");
+  if (/oblique|russian twist|side bend/.test(f)) add("obliques");
+  if (/\bquad|squat|leg extension|lunge/.test(f)) add("quadriceps");
+  if (/\bhamstring|\bham\b|deadlift|leg curl|rdl|romanian/.test(f)) add("hamstring");
+  if (/\bcalf|\bcalves|calf raise/.test(f)) add("calves");
+  if (/\btrap\b|\btraps\b|shrug/.test(f)) add("trapezius");
+  if (/upper back|rhomboid|row\b|rows\b|pulldown|pull-down|pull[- ]?up/.test(f))
+    add("upper-back");
+  if (/\blat\b|\blats\b|lat pulldown|pullover/.test(f)) add("upper-back");
+  if (/lower back|erector|hyperextension|good morning/.test(f)) add("lower-back");
+  if (/\bglute|hip thrust|\bbutt\b/.test(f)) add("gluteal");
+  if (/adductor|inner thigh/.test(f)) add("adductor");
+  if (/abductor|outer thigh|hip abduction/.test(f)) add("abductors");
 
-  // Direct keyword hits
-  if (/\bchest\b|pec/.test(f)) add("chest");
-  if (/\bshoulder|\bdelt/.test(f)) add("shoulders_front", "shoulders_rear");
-  if (/\bbicep/.test(f)) add("biceps");
-  if (/\btricep/.test(f)) add("triceps");
-  if (/\bforearm|\bgrip\b/.test(f)) add("forearms");
-  if (/\bab\b|\babs\b|\bcore\b/.test(f)) add("abs");
-  if (/\bquad/.test(f)) add("quads");
-  if (/\bhamstring|\bham\b/.test(f)) add("hamstrings");
-  if (/\bcalf|\bcalves/.test(f)) add("calves");
-  if (/\bupper back|\btrap|\brhomboid/.test(f)) add("upper_back");
-  if (/\blat\b|\blats\b/.test(f)) add("lats");
-  if (/\blower back|\berector/.test(f)) add("lower_back");
-  if (/\bglute|\bbutt\b/.test(f)) add("glutes");
-
-  // Split-pattern shortcuts
-  if (/\bpush\b/.test(f)) add("chest", "shoulders_front", "triceps");
-  if (/\bpull\b/.test(f)) add("upper_back", "lats", "biceps", "shoulders_rear");
-  if (/\bleg/.test(f)) add("quads", "hamstrings", "calves", "glutes");
-  if (/\bback\b/.test(f)) add("upper_back", "lats", "lower_back");
+  // Split shortcuts
+  if (/\bpush\b/.test(f)) add("chest", "front-deltoids", "triceps");
+  if (/\bpull\b/.test(f)) add("upper-back", "biceps", "back-deltoids");
+  if (/\bleg/.test(f)) add("quadriceps", "hamstring", "calves", "gluteal");
+  if (/\bback\b/.test(f)) add("upper-back", "lower-back");
   if (/\bupper\b/.test(f) && !/back/.test(f))
-    add("chest", "shoulders_front", "shoulders_rear", "biceps", "triceps", "upper_back", "lats");
+    add("chest", "front-deltoids", "back-deltoids", "biceps", "triceps", "upper-back");
   if (/\blower\b/.test(f) && !/back/.test(f))
-    add("quads", "hamstrings", "calves", "glutes");
+    add("quadriceps", "hamstring", "calves", "gluteal");
   if (/full body/.test(f))
     add(
       "chest",
-      "shoulders_front",
-      "shoulders_rear",
+      "front-deltoids",
+      "back-deltoids",
       "biceps",
       "triceps",
-      "quads",
-      "hamstrings",
+      "quadriceps",
+      "hamstring",
       "calves",
-      "glutes",
-      "upper_back",
-      "lats",
+      "gluteal",
+      "upper-back",
       "abs",
     );
 
   return Array.from(hits);
 }
 
-export function isRestFocus(focus: string, exerciseCount: number): boolean {
-  if (exerciseCount === 0) return true;
-  return /\brest\b|recovery|off day/i.test(focus);
+export function musclesForDay(day: PlanDay): Muscle[] {
+  const all = new Set<Muscle>();
+  matchText(day.focus).forEach((m) => all.add(m));
+  for (const ex of day.exercises) {
+    matchText(ex.name).forEach((m) => all.add(m));
+  }
+  return Array.from(all);
+}
+
+export function isRestDay(day: PlanDay): boolean {
+  if (day.exercises.length === 0) return true;
+  return /\brest\b|recovery|off day/i.test(day.focus);
+}
+
+export function todayPlanIndex(dayCount: number): number {
+  const jsDay = new Date().getDay(); // 0..6 (Sun..Sat)
+  const monIdx = (jsDay + 6) % 7;
+  return Math.min(monIdx, Math.max(0, dayCount - 1));
 }

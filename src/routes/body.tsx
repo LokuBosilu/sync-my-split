@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { LoadingState } from "@/components/gymsync/LoadingState";
@@ -8,18 +8,14 @@ import { MuscleMap } from "@/components/gymsync/MuscleMap";
 import { WeightTracker } from "@/components/gymsync/WeightTracker";
 import { AppNav } from "@/components/gymsync/AppNav";
 import { Toaster } from "@/components/ui/sonner";
-import {
-  muscleIdsFromFocus,
-  isRestFocus,
-  type MuscleId,
-} from "@/lib/muscle-map";
+import { musclesForDay, isRestDay, todayPlanIndex } from "@/lib/muscle-map";
 import type { WorkoutPlan } from "@/lib/gymsync";
 
 export const Route = createFileRoute("/body")({
   head: () => ({
     meta: [
       { title: "My Body — GymSync" },
-      { name: "description", content: "See today's targeted muscles and track your weight over time." },
+      { name: "description", content: "See targeted muscles per training day and track weight progress." },
     ],
   }),
   component: BodyPage,
@@ -31,6 +27,7 @@ function BodyPage() {
   const [bootstrapping, setBootstrapping] = useState(true);
   const [plan, setPlan] = useState<WorkoutPlan | null>(null);
   const [defaultUnit, setDefaultUnit] = useState<"kg" | "lbs">("kg");
+  const [selectedIdx, setSelectedIdx] = useState(0);
 
   useEffect(() => {
     if (!user) {
@@ -50,23 +47,18 @@ function BodyPage() {
           .maybeSingle(),
       ]);
       if (profRow?.weight_unit === "lbs") setDefaultUnit("lbs");
-      if (planRow?.plan) setPlan(planRow.plan as unknown as WorkoutPlan);
+      if (planRow?.plan) {
+        const p = planRow.plan as unknown as WorkoutPlan;
+        setPlan(p);
+        setSelectedIdx(todayPlanIndex(p.days.length));
+      }
       setBootstrapping(false);
     })();
   }, [user?.id]);
 
-  // Determine today's day in plan based on JS day-of-week (0=Sun..6=Sat).
-  // Map sequentially: plan day 1 = Monday.
-  const today = (() => {
-    if (!plan) return null;
-    const jsDay = new Date().getDay(); // 0..6
-    // Monday-first index (0=Mon..6=Sun)
-    const idx = (jsDay + 6) % 7;
-    return plan.days[idx % plan.days.length] ?? null;
-  })();
-
-  const restDay = today ? isRestFocus(today.focus, today.exercises.length) : true;
-  const activeMuscles: MuscleId[] = today && !restDay ? muscleIdsFromFocus(today.focus) : [];
+  const day = plan?.days[selectedIdx] ?? null;
+  const rest = day ? isRestDay(day) : true;
+  const active = useMemo(() => (day && !rest ? musclesForDay(day) : []), [day, rest]);
 
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -104,22 +96,49 @@ function BodyPage() {
             <header className="space-y-3">
               <p className="text-xs uppercase tracking-[0.3em] text-primary">My Body</p>
               <h1 className="text-5xl md:text-6xl font-display leading-none">
-                Today's Muscle Map
+                Muscle Map
               </h1>
               <p className="text-muted-foreground">
                 {plan
-                  ? restDay
-                    ? "No training scheduled — recovery is part of the work."
-                    : `Working ${activeMuscles.length} muscle group${activeMuscles.length === 1 ? "" : "s"} today.`
-                  : "Generate a workout plan to see today's targeted muscles."}
+                  ? "Pick a training day to see which muscles you're targeting."
+                  : "Generate a workout plan to see your targeted muscles."}
               </p>
             </header>
 
-            <MuscleMap
-              active={activeMuscles}
-              restDay={restDay}
-              focus={today?.focus}
-            />
+            {plan && (
+              <div className="flex flex-wrap gap-2">
+                {plan.days.map((d, i) => {
+                  const selected = i === selectedIdx;
+                  const isToday = i === todayPlanIndex(plan.days.length);
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => setSelectedIdx(i)}
+                      className={
+                        "rounded-md border px-4 py-2 text-xs uppercase tracking-wider transition-all " +
+                        (selected
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-card text-muted-foreground hover:text-foreground hover:border-primary/40")
+                      }
+                    >
+                      <span className="font-display tracking-widest">Day {d.day_number}</span>
+                      {isToday && (
+                        <span
+                          className={
+                            "ml-2 text-[9px] uppercase tracking-[0.2em] " +
+                            (selected ? "opacity-80" : "text-primary")
+                          }
+                        >
+                          Today
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            <MuscleMap active={active} restDay={rest} focus={day?.focus} />
 
             <WeightTracker userId={user.id} defaultUnit={defaultUnit} />
           </div>
