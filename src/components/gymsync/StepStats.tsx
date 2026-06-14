@@ -128,6 +128,28 @@ export function StepStats({ profile, onNext }: Props) {
         </div>
       </div>
 
+      <div className="flex items-start gap-3 rounded-xl border border-border bg-card p-4">
+        <input
+          type="checkbox"
+          id="consent"
+          checked={p.consentGiven ?? false}
+          onChange={(e) => setP({ ...p, consentGiven: e.target.checked })}
+          className="mt-0.5 h-4 w-4 shrink-0 accent-primary cursor-pointer"
+        />
+        <label htmlFor="consent" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
+          I agree to the{" "}
+          <a
+            href="/legal"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary underline hover:text-primary/80"
+            onClick={(e) => e.stopPropagation()}
+          >
+            Privacy Policy and Terms of Use
+          </a>
+        </label>
+      </div>
+
       <CTA disabled={!valid} onClick={() => onNext(p)}>Next — Set Up Equipment</CTA>
 
       <style>{`
