@@ -15,7 +15,8 @@ export function StepStats({ profile, onNext }: Props) {
     p.age > 0 &&
     p.weight > 0 &&
     (p.heightUnit === "cm" ? !!p.heightCm : (p.heightFt ?? 0) > 0) &&
-    !!p.goal;
+    !!p.goal &&
+    !!p.consentGiven;
 
   return (
     <div className="fade-slide-in space-y-10">
