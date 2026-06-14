@@ -43,6 +43,7 @@ const initialProfile: UserProfile = {
   goal: null,
   equipment: [],
   daysPerWeek: null,
+  consentGiven: false,
 };
 
 type Step = "stats" | "equipment" | "schedule" | "loading" | "plan";
