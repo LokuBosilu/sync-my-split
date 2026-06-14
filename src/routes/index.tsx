@@ -332,7 +332,21 @@ function Index() {
             {step === "stats" && (
               <StepStats
                 profile={profile}
-                onNext={(p) => { setProfile(p); setStep("equipment"); }}
+                onNext={async (p) => {
+                  const updated = { ...p, consentGiven: true as const, consentDate: new Date().toISOString() };
+                  if (user) {
+                    try {
+                      const { error } = await supabase
+                        .from("profiles")
+                        .upsert(profileToRow(updated, user.id) as any, { onConflict: "user_id" });
+                      if (error) console.error("[consent] save failed", error);
+                    } catch (e) {
+                      console.error(e);
+                    }
+                  }
+                  setProfile(updated);
+                  setStep("equipment");
+                }}
               />
             )}
             {step === "equipment" && (
