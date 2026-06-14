@@ -43,6 +43,7 @@ const initialProfile: UserProfile = {
   goal: null,
   equipment: [],
   daysPerWeek: null,
+  consentGiven: false,
 };
 
 type Step = "stats" | "equipment" | "schedule" | "loading" | "plan";
@@ -62,6 +63,8 @@ function rowToProfile(row: any): UserProfile {
     goal: (row.goal as Goal | null) ?? null,
     equipment: row.equipment ?? [],
     daysPerWeek: row.days_per_week ?? null,
+    consentGiven: row.consent_given ?? false,
+    consentDate: row.consent_date ?? undefined,
   };
 }
 
@@ -79,6 +82,8 @@ function profileToRow(p: UserProfile, userId: string) {
     goal: p.goal,
     equipment: p.equipment,
     days_per_week: p.daysPerWeek,
+    consent_given: p.consentGiven ?? false,
+    consent_date: p.consentDate ?? null,
   };
 }
 
@@ -171,7 +176,7 @@ function Index() {
     if (!user) return;
     const { error: pErr } = await supabase
       .from("profiles")
-      .upsert(profileToRow(p, user.id), { onConflict: "user_id" });
+      .upsert(profileToRow(p, user.id) as any, { onConflict: "user_id" });
     if (pErr) console.error(pErr);
 
     if (mode === "overwrite") {
@@ -327,7 +332,21 @@ function Index() {
             {step === "stats" && (
               <StepStats
                 profile={profile}
-                onNext={(p) => { setProfile(p); setStep("equipment"); }}
+                onNext={async (p) => {
+                  const updated = { ...p, consentGiven: true as const, consentDate: new Date().toISOString() };
+                  if (user) {
+                    try {
+                      const { error } = await supabase
+                        .from("profiles")
+                        .upsert(profileToRow(updated, user.id) as any, { onConflict: "user_id" });
+                      if (error) console.error("[consent] save failed", error);
+                    } catch (e) {
+                      console.error(e);
+                    }
+                  }
+                  setProfile(updated);
+                  setStep("equipment");
+                }}
               />
             )}
             {step === "equipment" && (

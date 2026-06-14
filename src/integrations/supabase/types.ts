@@ -96,6 +96,8 @@ export type Database = {
       profiles: {
         Row: {
           age: number | null
+          consent_date: string | null
+          consent_given: boolean
           created_at: string
           days_per_week: number | null
           equipment: string[] | null
@@ -113,6 +115,8 @@ export type Database = {
         }
         Insert: {
           age?: number | null
+          consent_date?: string | null
+          consent_given?: boolean
           created_at?: string
           days_per_week?: number | null
           equipment?: string[] | null
@@ -130,6 +134,8 @@ export type Database = {
         }
         Update: {
           age?: number | null
+          consent_date?: string | null
+          consent_given?: boolean
           created_at?: string
           days_per_week?: number | null
           equipment?: string[] | null
