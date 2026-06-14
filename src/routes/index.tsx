@@ -82,6 +82,8 @@ function profileToRow(p: UserProfile, userId: string) {
     goal: p.goal,
     equipment: p.equipment,
     days_per_week: p.daysPerWeek,
+    consent_given: p.consentGiven ?? false,
+    consent_date: p.consentDate ?? null,
   };
 }
 
