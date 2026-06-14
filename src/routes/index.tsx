@@ -63,6 +63,8 @@ function rowToProfile(row: any): UserProfile {
     goal: (row.goal as Goal | null) ?? null,
     equipment: row.equipment ?? [],
     daysPerWeek: row.days_per_week ?? null,
+    consentGiven: row.consent_given ?? false,
+    consentDate: row.consent_date ?? undefined,
   };
 }
 
