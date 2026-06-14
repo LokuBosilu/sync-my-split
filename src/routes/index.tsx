@@ -176,7 +176,7 @@ function Index() {
     if (!user) return;
     const { error: pErr } = await supabase
       .from("profiles")
-      .upsert(profileToRow(p, user.id), { onConflict: "user_id" });
+      .upsert(profileToRow(p, user.id) as any, { onConflict: "user_id" });
     if (pErr) console.error(pErr);
 
     if (mode === "overwrite") {
