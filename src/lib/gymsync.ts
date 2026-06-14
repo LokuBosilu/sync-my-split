@@ -12,6 +12,8 @@ export interface UserProfile {
   goal: Goal | null;
   equipment: string[];
   daysPerWeek: number | null;
+  consentGiven?: boolean;
+  consentDate?: string;
 }
 
 export interface Exercise {
