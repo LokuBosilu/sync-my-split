@@ -107,28 +107,42 @@ function Index() {
         localStorage.setItem("pendingInviteCode", invite.trim());
         url.searchParams.delete("invite");
         window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+        console.log("[invite] captured code from URL");
       }
-    } catch {}
+    } catch (e) {
+      console.error("[invite] capture failed", e);
+    }
   }, []);
 
-  // After sign-in, redeem any pending invite code → insert gym_members row
+  // After sign-in, redeem any pending invite code via RPC → inserts gym_members row.
+  // gym_invites is RLS-locked; only the redeem_gym_invite RPC (SECURITY DEFINER) can read it.
   useEffect(() => {
     if (!user) return;
-    const code = localStorage.getItem("pendingInviteCode");
+    // Fallback: also check the URL directly in case the user is already signed in
+    // and the first effect hasn't moved the code into localStorage yet.
+    let code = localStorage.getItem("pendingInviteCode");
+    if (!code) {
+      try {
+        const urlCode = new URL(window.location.href).searchParams.get("invite");
+        if (urlCode) code = urlCode.trim();
+      } catch {}
+    }
     if (!code) return;
     (async () => {
       try {
+        console.log("[invite] redeeming code via RPC");
         const { data: gymId, error } = await supabase.rpc("redeem_gym_invite", { _code: code });
         if (error) throw error;
+        localStorage.removeItem("pendingInviteCode");
         if (!gymId) {
-          toast.error("Invite code not found");
-          localStorage.removeItem("pendingInviteCode");
+          toast.error(`Invite code "${code}" not found`);
           return;
         }
-        localStorage.removeItem("pendingInviteCode");
         toast.success("Joined gym successfully");
       } catch (e) {
         console.error("[invite] redeem failed", e);
+        const msg = e instanceof Error ? e.message : "Failed to redeem invite";
+        toast.error(msg);
       }
     })();
   }, [user?.id]);
