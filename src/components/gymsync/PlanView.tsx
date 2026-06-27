@@ -50,6 +50,9 @@ export function PlanView({ profile, plan, onRegenerate, onRestart, regenerating,
         </p>
       </header>
 
+      <SessionTimer userId={userId} planId={planId} />
+
+
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {plan.days.map((day) => (
           <DayCard key={day.day_number} day={day} />
