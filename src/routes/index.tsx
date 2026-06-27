@@ -230,7 +230,7 @@ function Index() {
       .select()
       .single();
     if (planErr) console.error(planErr);
-    if (planRow) setPlanCreatedAt(new Date(planRow.created_at));
+    if (planRow) { setPlanCreatedAt(new Date(planRow.created_at)); setPlanId(planRow.id); }
     setPlanNumber(nextPlanNumber);
   };
 
