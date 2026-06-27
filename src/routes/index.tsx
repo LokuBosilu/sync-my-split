@@ -95,6 +95,7 @@ function Index() {
   const [plan, setPlan] = useState<WorkoutPlan | null>(null);
   const [planNumber, setPlanNumber] = useState(0);
   const [planCreatedAt, setPlanCreatedAt] = useState<Date | null>(null);
+  const [planId, setPlanId] = useState<string | null>(null);
   const [regenerating, setRegenerating] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
 
@@ -173,6 +174,7 @@ function Index() {
         setPlan(planRow.plan as unknown as WorkoutPlan);
         setPlanNumber(planRow.plan_number);
         setPlanCreatedAt(new Date(planRow.created_at));
+        setPlanId(planRow.id);
         setStep("plan");
       } else {
         setStep("stats");
@@ -212,7 +214,7 @@ function Index() {
           .select()
           .single();
         if (updErr) console.error(updErr);
-        if (updated) setPlanCreatedAt(new Date(updated.created_at));
+        if (updated) { setPlanCreatedAt(new Date(updated.created_at)); setPlanId(updated.id); }
         return;
       }
       // Fall through to insert if no existing row
@@ -228,7 +230,7 @@ function Index() {
       .select()
       .single();
     if (planErr) console.error(planErr);
-    if (planRow) setPlanCreatedAt(new Date(planRow.created_at));
+    if (planRow) { setPlanCreatedAt(new Date(planRow.created_at)); setPlanId(planRow.id); }
     setPlanNumber(nextPlanNumber);
   };
 
@@ -292,7 +294,7 @@ function Index() {
     setProfile(initialProfile);
     setPlan(null);
     setPlanNumber(0);
-    setPlanCreatedAt(null);
+    setPlanCreatedAt(null); setPlanId(null);
     setBannerDismissed(false);
     setStep("stats");
   };
@@ -302,7 +304,7 @@ function Index() {
     setProfile(initialProfile);
     setPlan(null);
     setPlanNumber(0);
-    setPlanCreatedAt(null);
+    setPlanCreatedAt(null); setPlanId(null);
     setStep("stats");
   };
 
@@ -391,6 +393,7 @@ function Index() {
                 )}
                 <PlanView
                   userId={user.id}
+                  planId={planId}
                   profile={profile}
                   plan={plan}
                   regenerating={regenerating}
