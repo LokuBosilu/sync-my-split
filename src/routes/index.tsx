@@ -294,7 +294,7 @@ function Index() {
     setProfile(initialProfile);
     setPlan(null);
     setPlanNumber(0);
-    setPlanCreatedAt(null);
+    setPlanCreatedAt(null); setPlanId(null);
     setBannerDismissed(false);
     setStep("stats");
   };
@@ -304,7 +304,7 @@ function Index() {
     setProfile(initialProfile);
     setPlan(null);
     setPlanNumber(0);
-    setPlanCreatedAt(null);
+    setPlanCreatedAt(null); setPlanId(null);
     setStep("stats");
   };
 
