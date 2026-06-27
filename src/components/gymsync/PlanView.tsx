@@ -10,6 +10,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { PlanHistory } from "./PlanHistory";
+import { SessionTimer } from "./SessionTimer";
 
 interface Props {
   profile: UserProfile;
@@ -18,9 +19,10 @@ interface Props {
   onRestart: () => void;
   regenerating: boolean;
   userId: string;
+  planId: string | null;
 }
 
-export function PlanView({ profile, plan, onRegenerate, onRestart, regenerating, userId }: Props) {
+export function PlanView({ profile, plan, onRegenerate, onRestart, regenerating, userId, planId }: Props) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [restartOpen, setRestartOpen] = useState(false);
