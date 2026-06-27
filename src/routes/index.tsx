@@ -174,6 +174,7 @@ function Index() {
         setPlan(planRow.plan as unknown as WorkoutPlan);
         setPlanNumber(planRow.plan_number);
         setPlanCreatedAt(new Date(planRow.created_at));
+        setPlanId(planRow.id);
         setStep("plan");
       } else {
         setStep("stats");
