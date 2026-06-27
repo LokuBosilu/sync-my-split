@@ -95,6 +95,7 @@ function Index() {
   const [plan, setPlan] = useState<WorkoutPlan | null>(null);
   const [planNumber, setPlanNumber] = useState(0);
   const [planCreatedAt, setPlanCreatedAt] = useState<Date | null>(null);
+  const [planId, setPlanId] = useState<string | null>(null);
   const [regenerating, setRegenerating] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
 
