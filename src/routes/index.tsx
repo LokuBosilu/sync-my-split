@@ -393,6 +393,7 @@ function Index() {
                 )}
                 <PlanView
                   userId={user.id}
+                  planId={planId}
                   profile={profile}
                   plan={plan}
                   regenerating={regenerating}
