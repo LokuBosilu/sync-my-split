@@ -214,7 +214,7 @@ function Index() {
           .select()
           .single();
         if (updErr) console.error(updErr);
-        if (updated) setPlanCreatedAt(new Date(updated.created_at));
+        if (updated) { setPlanCreatedAt(new Date(updated.created_at)); setPlanId(updated.id); }
         return;
       }
       // Fall through to insert if no existing row
