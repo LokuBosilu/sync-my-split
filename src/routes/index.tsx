@@ -88,7 +88,7 @@ function profileToRow(p: UserProfile, userId: string) {
 }
 
 function Index() {
-  const { user, loading: authLoading, authError } = useAuth();
+  const { user, session, loading: authLoading, authError } = useAuth();
   const [bootstrapping, setBootstrapping] = useState(true);
   const [step, setStep] = useState<Step>("stats");
   const [profile, setProfile] = useState<UserProfile>(initialProfile);
@@ -117,10 +117,12 @@ function Index() {
 
   // After sign-in, redeem any pending invite code via RPC → inserts gym_members row.
   // gym_invites is RLS-locked; only the redeem_gym_invite RPC (SECURITY DEFINER) can read it.
+  // CRITICAL: wait until the auth session is fully hydrated (authLoading === false)
+  // AND session.user.id exists — otherwise auth.uid() inside the RPC returns null
+  // and the redemption fails silently for magic-link landings.
   useEffect(() => {
-    if (!user) return;
-    // Fallback: also check the URL directly in case the user is already signed in
-    // and the first effect hasn't moved the code into localStorage yet.
+    if (authLoading) return;
+    if (!session?.user?.id) return;
     let code = localStorage.getItem("pendingInviteCode");
     if (!code) {
       try {
@@ -146,7 +148,7 @@ function Index() {
         toast.error(msg);
       }
     })();
-  }, [user?.id]);
+  }, [authLoading, session?.user?.id]);
 
   // Load existing profile + latest plan when user signs in
   useEffect(() => {
